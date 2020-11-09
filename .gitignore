@@ -1,0 +1,8 @@
+naluX
+*.log
+*.dat
+out/
+rst/
+out-*/
+rst-*/
+out.*
