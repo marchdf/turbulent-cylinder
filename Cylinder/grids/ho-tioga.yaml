@@ -1,0 +1,23 @@
+input_mesh: cylinder0.exo
+
+output_mesh: holecut/holecut.g
+
+decomposition_method: rcb
+
+dump_tioga_partitions: false
+
+write_outputs: true
+
+overset_info:
+  mesh_group:
+    - overset_name: cylinder
+      mesh_parts: [ cylinder-HEX ]
+      ovset_parts: [ outerbc_cylinderblock ]
+      wall_parts: [cylinder]
+
+    - overset_name: wake
+      mesh_parts: [ wake-HEX ]
+      ovset_parts: [ outerbc_wakeblock ]
+
+    - overset_name: background
+      mesh_parts: [ background-HEX ]

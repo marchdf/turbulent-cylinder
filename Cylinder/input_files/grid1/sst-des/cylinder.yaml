@@ -43,6 +43,7 @@ realms:
 
 - name: realm_1
   mesh: ../../../grids/grid1.exo
+  automatic_decomposition_type: rcb
   use_edges: yes
 
   equation_systems:
