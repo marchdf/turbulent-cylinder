@@ -4,7 +4,6 @@
 #SBATCH --time=4:00:00
 #SBATCH --account=hfm
 #SBATCH --job-name=cyl_grid0
-#SBATCH --partition=short
 #SBATCH --output=out.%x_%j
 
 module purge

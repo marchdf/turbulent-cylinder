@@ -123,9 +123,18 @@ realms:
       turbulent_ke: 0.095118
       specific_dissipation_rate: 2266.4
 
-  - symmetry_boundary_condition: bc_symSides
-    target_name: sides
+  - symmetry_boundary_condition: bc_top
+    target_name: top
     symmetry_user_data:
+
+  - symmetry_boundary_condition: bc_bottom
+    target_name: bottom
+    symmetry_user_data:
+
+  - periodic_boundary_condition: bc_periodic
+    target_name: [front, back]
+    periodic_user_data:
+      search_tolerance: 0.00000001
 
   solution_options:
     name: myOptions

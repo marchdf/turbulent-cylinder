@@ -250,7 +250,6 @@ Time_Integrators:
     start_time: 0
     time_step: 0.03
     termination_step_count: 6800
-    #termination_step_count: 100
     time_stepping_type: fixed
     time_step_count: 0
     second_order_accuracy: yes

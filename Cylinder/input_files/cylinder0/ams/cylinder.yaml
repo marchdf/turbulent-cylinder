@@ -42,7 +42,7 @@ linear_solvers:
 realms:
 
 - name: realm_1
-  mesh: ../sst/cylinder.rst
+  mesh: ../sst/rst/cylinder.rst
   use_edges: yes
 
   equation_systems:
@@ -77,8 +77,9 @@ realms:
   initial_conditions:
   - constant: ic_1
     target_name:
-    - fluid-HEX
-    - fluid-WEDGE
+      - cylinder-HEX
+      - background-HEX
+      - wake-HEX
     value:
       pressure: 0
       velocity: [20.0, 0.0, 0.0]
@@ -88,12 +89,13 @@ realms:
       average_tke_resolved: 0.0
       average_dudx: 0.0
       k_ratio: 1.0
-      avg_res_adequacy_parameter: 1.0 
+      avg_res_adequacy_parameter: 1.0
 
   material_properties:
     target_name:
-    - fluid-HEX
-    - fluid-WEDGE
+      - cylinder-HEX
+      - background-HEX
+      - wake-HEX
     specifications:
     - name: density
       type: constant
@@ -111,7 +113,6 @@ realms:
       velocity: [0.0, 0.0, 0.0]
       turbulent_ke: 0.0
 
-
   - inflow_boundary_condition: bc_inflow
     target_name: inlet
     inflow_user_data:
@@ -127,13 +128,39 @@ realms:
       turbulent_ke: 0.095118
       specific_dissipation_rate: 2266.4
 
-  - symmetry_boundary_condition: bc_symSides
-    target_name: sides
+  - symmetry_boundary_condition: bc_top
+    target_name: top
     symmetry_user_data:
+
+  - symmetry_boundary_condition: bc_bottom
+    target_name: bottom
+    symmetry_user_data:
+
+  - periodic_boundary_condition: bc_periodic
+    target_name: [front, back]
+    periodic_user_data:
+      search_tolerance: 0.00000001
+
+  - overset_boundary_condition: bc_overset
+    overset_connectivity_type: tioga
+    overset_user_data:
+      tioga_populate_inactive_part: false
+      mesh_group:
+        - overset_name: cylinder
+          mesh_parts: [ cylinder-HEX ]
+          ovset_parts: [ outerbc_cylinderblock ]
+          wall_parts: [cylinder]
+
+        - overset_name: wake
+          mesh_parts: [ wake-HEX ]
+          ovset_parts: [ outerbc_wakeblock ]
+
+        - overset_name: background
+          mesh_parts: [ background-HEX ]
 
   solution_options:
     name: myOptions
-    turbulence_model: sst_tams
+    turbulence_model: sst_ams
     projected_timescale_type: momentum_diag_inv
 
     options:
@@ -188,8 +215,9 @@ realms:
     specifications:
     - name: one
       target_name:
-      - fluid-HEX
-      - fluid-WEDGE
+      - cylinder-HEX
+      - background-HEX
+      - wake-HEX
       reynolds_averaged_variables:
       - velocity
       compute_q_criterion: yes
@@ -198,7 +226,7 @@ realms:
   restart:
     restart_data_base_name: rst/cylinder.rst
     restart_frequency: 1000
-    restart_start: 360
+    restart_start: 0
     restart_time: 10000000000.0
 
   output:
@@ -220,6 +248,7 @@ realms:
     - alpha_upw
     - pressure_force
     - viscous_force
+    - element_courant
     - average_velocity
     - k_ratio
     - average_mass_flow_rate
@@ -229,9 +258,6 @@ realms:
     - metric_tensor
     - average_production
     - average_dudx
-    - element_courant
-    - iblank
-    - iblank_cell
 
 Time_Integrators:
 - StandardTimeIntegrator:

@@ -134,7 +134,7 @@ realms:
 
   solution_options:
     name: myOptions
-    turbulence_model: sst_tams
+    turbulence_model: sst_ams
     projected_timescale_type: momentum_diag_inv
 
     options:
