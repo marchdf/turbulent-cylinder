@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes=4
+#SBATCH --nodes=12
 #SBATCH --time=48:00:00
 #SBATCH --account=hfm
 #SBATCH --job-name=cyl_grid1

@@ -42,7 +42,7 @@ linear_solvers:
 realms:
 
 - name: realm_1
-  mesh: ../sst/cylinder.rst
+  mesh: ../sst/rst/cylinder.rst
   use_edges: yes
 
   equation_systems:

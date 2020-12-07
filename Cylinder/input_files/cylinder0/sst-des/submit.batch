@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=4
-#SBATCH --time=4:00:00
+#SBATCH --time=48:00:00
 #SBATCH --account=hfm
 #SBATCH --job-name=cyl_grid0
 #SBATCH --output=out.%x_%j
