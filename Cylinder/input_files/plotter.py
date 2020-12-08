@@ -199,6 +199,15 @@ if __name__ == "__main__":
             label=f"Nalu-{model}",
         )
 
+        plt.figure("cf")
+        plt.plot(
+            cpcf.theta,
+            cpcf.tauw / dynPres,
+            lw=2,
+            color=cmap[i],
+            label=f"Nalu-{model}",
+        )
+
         # spectra
         for c in ["cl", "cd"]:
             y, k = get_spectra(
@@ -250,6 +259,17 @@ if __name__ == "__main__":
         ax = plt.gca()
         plt.xlabel(r"$\theta$", fontsize=22, fontweight="bold")
         plt.ylabel(r"$C_p$", fontsize=22, fontweight="bold")
+        plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight="bold")
+        plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight="bold")
+        plt.xlim([-1, 181])
+        legend = ax.legend(loc="best")
+        plt.tight_layout()
+        pdf.savefig(dpi=300)
+
+        plt.figure("cf")
+        ax = plt.gca()
+        plt.xlabel(r"$\theta$", fontsize=22, fontweight="bold")
+        plt.ylabel(r"$C_f$", fontsize=22, fontweight="bold")
         plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight="bold")
         plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight="bold")
         plt.xlim([-1, 181])
