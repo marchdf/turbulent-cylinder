@@ -229,6 +229,8 @@ realms:
     - alpha_upw
     - pressure_force
     - viscous_force
+    - tau_wall
+    - tau_wall_vector
     - average_velocity
     - k_ratio
     - average_mass_flow_rate

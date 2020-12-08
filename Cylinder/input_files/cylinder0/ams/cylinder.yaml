@@ -248,6 +248,8 @@ realms:
     - alpha_upw
     - pressure_force
     - viscous_force
+    - tau_wall
+    - tau_wall_vector
     - element_courant
     - average_velocity
     - k_ratio
