@@ -109,7 +109,6 @@ if __name__ == "__main__":
     comm.Barrier()
     if rank == 0:
         df = pd.DataFrame(np.vstack(lst), columns=names)
-        df = df[df.y >= 0]
         cyl = df.groupby("x", as_index=False).mean().sort_values(by=["x"])
         cyl["r"] = np.sqrt(cyl.x ** 2 + cyl.y ** 2)
         cyl["theta"] = (np.arctan2(cyl.x, cyl.y) + np.pi * 0.5) * 180 / np.pi

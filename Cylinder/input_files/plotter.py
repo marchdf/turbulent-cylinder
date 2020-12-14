@@ -68,6 +68,46 @@ def parse_ic(fname):
             print(exc)
 
 
+# The Tukey window
+# see https://en.wikipedia.org/wiki/Window_function#Tukey_window
+def tukeyWindow(N, params={"alpha": 0.1}):
+    alpha = params["alpha"]
+    w = np.zeros(N)
+    L = N + 1
+    for n in np.arange(0, int(N // 2) + 1):
+        if (0 <= n) and (n < 0.5 * alpha * L):
+            w[n] = 0.5 * (1.0 - np.cos(2 * np.pi * n / (alpha * L)))
+        elif (0.5 * alpha * L <= n) and (n <= N / 2):
+            w[n] = 1.0
+        else:
+            print("Something wrong happened at n = ", n)
+        if n != 0:
+            w[N - n] = w[n]
+    return w
+
+
+# FFT's a signal, returns 1-sided frequency and spectra
+def getFFT(t, y, normalize=False, window=True):
+    n = len(y)
+    k = np.arange(n)
+    dt = np.mean(np.diff(t))
+    frq = k / (n * dt)
+    if window:
+        w = tukeyWindow(n)
+    else:
+        w = 1.0
+    if normalize:
+        L = len(y)
+    else:
+        L = 1.0
+    FFTy = np.fft.fft(w * y) / L
+
+    # Take the one sided version of it
+    freq = frq[range(int(n // 2))]
+    FFTy = FFTy[range(int(n // 2))]
+    return freq, FFTy
+
+
 def get_spectra(y, dt, ref_timescale):
     n_size = np.size(y)
     n_sizeB2 = int(n_size / 2)
@@ -166,7 +206,7 @@ if __name__ == "__main__":
         avg_forces = forces[
             (args.tmin < forces.Time) & (forces.Time < args.tmax)
         ].mean()
-        avg_forces["Re"] = 8e6
+        avg_forces["Re"] = rho * uInfty * cylDiameter / mu
 
         plt.figure("cd")
         plt.plot(
@@ -201,23 +241,25 @@ if __name__ == "__main__":
 
         plt.figure("cf")
         plt.plot(
-            cpcf.theta,
-            cpcf.tauw / dynPres,
-            lw=2,
-            color=cmap[i],
-            label=f"Nalu-{model}",
+            cpcf.theta, cpcf.tauw / dynPres, lw=2, color=cmap[i], label=f"Nalu-{model}",
         )
 
         # spectra
         for c in ["cl", "cd"]:
-            y, k = get_spectra(
-                forces[(args.tmin < forces.Time) & (forces.Time < args.tmax)][c],
-                dt * refTime,
-                refTime,
+            idx = (args.tmin < forces.Time) & (forces.Time < args.tmax)
+            f, y = getFFT(
+                forces.Time[idx] * cylDiameter / uInfty, forces[idx][c], normalize=True,
             )
             plt.figure(f"fft_{c}")
-            plt.plot(
-                k, y, lw=2, color=cmap[i], label=f"Nalu-{model}",
+            plt.loglog(
+                f * cylDiameter / uInfty,
+                abs(y),
+                lw=2,
+                color=cmap[i],
+                label=f"Nalu-{model}",
+            )
+            print(
+                f"{model}: predicted St based on {c} = {f[np.argmax(abs(y))]* cylDiameter / uInfty}."
             )
 
     pname = "plots.pdf"
@@ -279,22 +321,26 @@ if __name__ == "__main__":
 
         plt.figure("fft_cd")
         ax = plt.gca()
+        plt.axvline(0.37, linestyle="--", color="gray")
         plt.xlabel(r"$f D/u_\infty$", fontsize=22, fontweight="bold")
         plt.ylabel(r"$A_d$", fontsize=22, fontweight="bold")
         plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight="bold")
         plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight="bold")
-        plt.xlim([0, 2])
+        plt.xlim([1e-2, 2])
+        plt.ylim([1e-8, 1e0])
         legend = ax.legend(loc="best")
         plt.tight_layout()
         pdf.savefig(dpi=300)
 
         plt.figure("fft_cl")
         ax = plt.gca()
+        plt.axvline(0.37, linestyle="--", color="gray")
         plt.xlabel(r"$f D/u_\infty$", fontsize=22, fontweight="bold")
         plt.ylabel(r"$A_l$", fontsize=22, fontweight="bold")
         plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight="bold")
         plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight="bold")
-        plt.xlim([0, 2])
+        plt.xlim([1e-2, 2])
+        plt.ylim([1e-8, 1e0])
         legend = ax.legend(loc="best")
         plt.tight_layout()
         pdf.savefig(dpi=300)
